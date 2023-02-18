@@ -303,6 +303,7 @@ def main(default_filter: typing.Optional[str] = None):
         last_a = False
         last_b = False
         last_l = False
+        last_r = False
         last_zr = False
         last_home = False
         last_plus = False
@@ -331,6 +332,8 @@ def main(default_filter: typing.Optional[str] = None):
                 data = procon.ControllerData(report)
 
                 # progress.console.print(data)
+                if data.buttons.sticks.LEFT and data.buttons.sticks.RIGHT:
+                    return
 
                 if data.buttons.SHARE != last_share and data.buttons.SHARE:
                     if keyboard_viewer:
@@ -447,6 +450,7 @@ def main(default_filter: typing.Optional[str] = None):
                 last_a = data.buttons.A
                 last_b = data.buttons.B
                 last_l = data.buttons.L
+                last_r = data.buttons.R
                 last_zr = data.buttons.ZR
                 last_home = data.buttons.HOME
                 last_plus = data.buttons.PLUS
@@ -464,8 +468,6 @@ def main(default_filter: typing.Optional[str] = None):
             except Exception:
                 # progress.console.print_exception()
                 pass
-
-    time.sleep(10)
 
 
 if __name__ == "__main__":
