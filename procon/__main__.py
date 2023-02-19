@@ -10,11 +10,11 @@ Animenosekai
 """
 
 import typing
-import time
 import shutil
 import queue
 import threading
 import argparse
+import pathlib
 
 import rich.console
 import rich.progress
@@ -23,11 +23,22 @@ import rich.table
 import rich.live
 import rich.layout
 from pynput import keyboard, mouse
-import hid
-import enum
+import notifypy
 
 import procon
-import procon_keyboard
+from procon import procon_keyboard
+
+
+def notify(msg: str):
+    return
+    notification = notifypy.Notify()
+
+    notification.title = "ProCon"
+    notification.message = str(msg)
+
+    notification.icon = str((pathlib.Path(__file__).parent.parent / "yay.png").absolute())
+
+    notification.send()
 
 
 def sanitizer(el: typing.Any):
@@ -298,6 +309,7 @@ def main(default_filter: typing.Optional[str] = None):
             rich.progress.TimeElapsedColumn()),
             transient=True) as progress:
         progress.add_task("[green][✓] Connected")
+        notify("Connected to a Pro Controller")
 
         last_share = False
         last_a = False
@@ -356,6 +368,8 @@ def main(default_filter: typing.Optional[str] = None):
                 if last_minus != data.buttons.MINUS and data.buttons.MINUS:
                     keyboard_controller.press(keyboard.Key.media_volume_down)
 
+                keyboard_title = ["ProCon"]
+
                 if keyboard_viewer is not None and captured:
                     # keyboard_viewer.app.update()
 
@@ -379,8 +393,20 @@ def main(default_filter: typing.Optional[str] = None):
                     if data.buttons.L:
                         keyboard_controller.press(keyboard.Key.shift)
 
+                    if data.buttons.ZL:
+                        if keyboard_controller.shift_pressed:
+                            keyboard_controller.release(keyboard.Key.shift)
+                        else:
+                            keyboard_controller.press(keyboard.Key.shift)
+
+                    element: procon_keyboard.KeyboardElement = keyboard_viewer.cursor.element
+                    keyboard_title.append("`{}` selected".format(element))
+
+                    if keyboard_controller.shift_pressed:
+                        keyboard_title.append("⇧ Shifted")
+
                     if last_a != data.buttons.A and data.buttons.A:
-                        element: procon_keyboard.KeyboardElement = keyboard_viewer.cursor.element
+                        # element: procon_keyboard.KeyboardElement = keyboard_viewer.cursor.element
 
                         match element:
                             case procon_keyboard.SpecialKey.ESC:
@@ -392,7 +418,7 @@ def main(default_filter: typing.Optional[str] = None):
                             case procon_keyboard.SpecialKey.ENTER:
                                 pressing(keyboard.Key.enter)
                             case procon_keyboard.SpecialKey.CAPS_LOCK:
-                                pressing(keyboard.Key.caps_lock)
+                                keyboard_controller.press(keyboard.Key.shift)
                             case procon_keyboard.SpecialKey.SHIFT:
                                 pressing(keyboard.Key.shift_l)
                             case procon_keyboard.SpecialKey.RIGHT_SHIFT:
@@ -415,6 +441,11 @@ def main(default_filter: typing.Optional[str] = None):
                         mouse_controller.press(mouse.Button.left)
                     elif data.buttons.A != last_a and not data.buttons.A:
                         mouse_controller.release(mouse.Button.left)
+
+                    if data.buttons.B != last_b and data.buttons.B:
+                        mouse_controller.press(mouse.Button.right)
+                    elif data.buttons.B != last_b and not data.buttons.B:
+                        mouse_controller.release(mouse.Button.right)
 
                     if data.buttons.L:
                         factor = 10
@@ -440,10 +471,11 @@ def main(default_filter: typing.Optional[str] = None):
 
                 if keyboard_viewer is not None:
                     if captured:
-                        keyboard_viewer.app.title("ProCon Keyboard — Captured")
+                        keyboard_title.append("Captured")
                     else:
-                        keyboard_viewer.app.title("ProCon Keyboard — Not Captured")
+                        keyboard_title.append("Not Captured")
 
+                    keyboard_viewer.app.title(" - ".join(keyboard_title))
                     keyboard_viewer.app.update()
 
                 last_share = data.buttons.SHARE

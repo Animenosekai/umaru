@@ -161,11 +161,16 @@ def move_on_keyboard(direction: Direction, keyboard: KeyboardViewer):
                 keyboard.cursor.x = current_cursor_x
                 # print(keyboard.cursor)
                 keyboard.cursor.element = button
-                keyboard.buttons[current].configure(bg="#ccc", fg="#666")
+                # keyboard.buttons[current]["background"] = "#222"
+                keyboard.buttons[current].configure(fg="red", bg="red", background="red", activebackground="red",
+                                                    activeforeground="red", state="active")
             else:
-                keyboard.buttons[current].configure(bg="#fff", fg="#111")
+                keyboard.buttons[current].configure(fg="black", bg="SystemButtonFace", background="SystemButtonFace", activebackground="SystemButtonFace",
+                                                    activeforeground="black", state="normal")
+                # keyboard.buttons[current]["background"] = "SystemButtonFace"
             current += 1
 
+    keyboard.app.update()
     return keyboard.cursor
 
 

@@ -10,3 +10,6 @@ Animenosekai
 """
 
 from .procon import *
+from . import procon_keyboard
+from . import __main__
+# from .procon_keyboard import *
