@@ -11,6 +11,20 @@ report =
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | -- | -- | -- | -- | -- | -- | -- |
 | [Unknown](#unknown) | [Timestamp](#the-timestamp) | *Unknown* | [Right Buttons](#right-buttons) | [Middle Buttons](#middle-buttons) | [Left Buttons](#left-buttons) | *Unknown* | *Unknown* | [Left Stick](#left-stick) | *Unknown* | *Unknown* | [Right Stick](#right-stick) | *Unknown* | *Unknown* | *Unknown* | *Unknown* |
 
+## Index
+
+- [Index](#index)
+- [Unknown](#unknown)
+- [The timestamp](#the-timestamp)
+- [Bitmasks](#bitmasks)
+  - [Right buttons](#right-buttons)
+  - [Middle buttons](#middle-buttons)
+  - [Left buttons](#left-buttons)
+- [Analog Sticks](#analog-sticks)
+  - [Left Stick](#left-stick)
+  - [Right Stick](#right-stick)
+- [Implementation](#implementation)
+
 ## Unknown
 
 > `report[0]`
@@ -95,3 +109,9 @@ Ranges from 23 (bottom) to 226 (up)
 > `report[11]`
 
 Ranges from 31 (bottom) to 227 (up)
+
+## Implementation
+
+Here is the parser used by `umaru` to use those values:
+
+<https://github.com/Animenosekai/umaru/blob/57c7d74f2a9a5831a90d0d9aa06b4b40d75db880/umaru/umaru.py#L105-L234>
