@@ -1,7 +1,7 @@
 """
-procon.py
+umaru.py
 
-Core internals for procon
+Core internals for umaru
 """
 
 import dataclasses
@@ -84,6 +84,7 @@ def open_connection(device: Device):
 
 
 class ControllerButtons:
+    """The controller buttons representation"""
     def __repr__(self) -> str:
         results = []
         for attr in dir(self):
@@ -98,31 +99,42 @@ class ControllerButtons:
                     results.append(str(content))
                 else:
                     results.append(attr)
-        return "{}({})".format(self.__class__.__name__, ", ".join(results))
+        return f"{self.__class__.__name__}({', '.join(results)})"
 
 
 class ControllerData:
     """
+    Represents the data coming from the controller
     """
 
     class Buttons(ControllerButtons):
+        """The different buttons on the controller"""
         class DirectionalPad(ControllerButtons):
+            """Represents a directional pad on the controller"""
+
             def __init__(self, bitmask: int = 0) -> None:
                 def check_bitmask(bit: int = 0):
                     return bool(bit & bitmask)
 
                 self.DOWN = check_bitmask(0b00000001)
+                """If the down button is pressed"""
                 self.UP = check_bitmask(0b00000010)
+                """If the up button is pressed"""
                 self.RIGHT = check_bitmask(0b00000100)
+                """If the right button is pressed"""
                 self.LEFT = check_bitmask(0b00001000)
-
+                """If the left button is pressed"""
         class Stick(ControllerButtons):
+            """Represents a stick on the controller"""
+
             def __init__(self, bitmask: int = 0) -> None:
                 def check_bitmask(bit: int = 0):
                     return bool(bit & bitmask)
 
                 self.RIGHT = check_bitmask(0b00000100)
+                """If the right stick is pressed"""
                 self.LEFT = check_bitmask(0b00001000)
+                """If the left stick is pressed"""
 
         def __init__(self, left: int = 0, middle: int = 0, right: int = 0) -> None:
             # Right buttons
@@ -130,33 +142,50 @@ class ControllerData:
                 return bool(bit & right)
 
             self.Y = check_right(0b00000001)
+            """If the Y button is pressed"""
             self.X = check_right(0b00000010)
+            """If the X button is pressed"""
             self.B = check_right(0b00000100)
+            """If the B button is pressed"""
             self.A = check_right(0b00001000)
+            """If the A button is pressed"""
             self.R = check_right(0b01000000)
+            """If the R button is pressed"""
             self.ZR = check_right(0b10000000)
+            """If the ZR button is pressed"""
 
             # Middle buttons
             def check_middle(bit: int = 0):
                 return bool(bit & middle)
 
             self.MINUS = check_middle(0b00000001)
+            """If the - button is pressed"""
             self.PLUS = check_middle(0b00000010)
+            """If the + button is pressed"""
             self.sticks = self.Stick(middle)
+            """If the sticks are pressed"""
             self.HOME = check_middle(0b00010000)
+            """If the HOME button is pressed"""
             self.SHARE = check_middle(0b00100000)
+            """If the share button is pressed"""
 
             # Left buttons
             def check_left(bit: int = 0):
                 return bool(bit & left)
 
             self.directional = self.DirectionalPad(left)
+            """The different directional pad buttons"""
             self.L = check_left(0b01000000)
+            """If the L button is pressed"""
             self.ZL = check_left(0b10000000)
+            """If the ZL button is pressed"""
 
     class AnalogStick:
+        """Represents an analog stick"""
         BOTTOM: int
+        """The bottom position value"""
         UP: int
+        """The up position value"""
 
         def __init__(self, y: int) -> None:
             self.range_center = ((self.UP + self.BOTTOM) / 2)
@@ -166,6 +195,7 @@ class ControllerData:
             return "{}(y={})".format(self.__class__.__name__, self.y)
 
     class LeftStick(AnalogStick):
+        """Represents the left stick"""
         BOTTOM = 25
         # BOTTOM = 23
         # UP = 226
@@ -175,6 +205,7 @@ class ControllerData:
             super().__init__(y)
 
     class RightStick(AnalogStick):
+        """Represents the right stick"""
         BOTTOM = 25
         # BOTTOM = 31
         # UP = 227
@@ -203,4 +234,4 @@ class ControllerData:
         self.right_stick = self.RightStick(data[11])
 
     def __repr__(self) -> str:
-        return "{}({}, {}, {})".format(self.__class__.__name__, self.buttons, self.left_stick, self.right_stick)
+        return f"{self.__class__.__name__}({self.buttons}, {self.left_stick}, {self.right_stick})"

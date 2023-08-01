@@ -1,7 +1,7 @@
 """
-ProCon
+Umaru
 
-The command line interface for ProCon — A pro controller driver
+The command line interface for Umaru — A pro controller driver
 
 Copyright
 ---------
@@ -23,17 +23,17 @@ import rich.table
 import rich.live
 import rich.layout
 from pynput import keyboard, mouse
-import notifypy
+# import notifypy
 
-import procon
-from procon import procon_keyboard
+import umaru
+from umaru import umaru_keyboard
 
 
 def notify(msg: str):
     return
     notification = notifypy.Notify()
 
-    notification.title = "ProCon"
+    notification.title = "Umaru"
     notification.message = str(msg)
 
     notification.icon = str((pathlib.Path(__file__).parent.parent / "yay.png").absolute())
@@ -142,13 +142,13 @@ def input_loop(input_queue: queue.Queue, default_filter: typing.Optional[str] = 
                 input_queue.put(Filter(query=query))
 
 
-def reduce_devices(devices: list[procon.Device], query: typing.Optional[str] = None):
+def reduce_devices(devices: list[umaru.Device], query: typing.Optional[str] = None):
     """
     Reduces the number of devices shown
 
     Parameters
     ----------
-    devices: list[procon.Device]
+    devices: list[umaru.Device]
     query: typing.Optional[str], default = None
     """
     if query:
@@ -163,13 +163,13 @@ def reduce_devices(devices: list[procon.Device], query: typing.Optional[str] = N
     ]
 
 
-def create_table(devices: list[procon.Device], current_device: int = 0, limit: typing.Optional[int] = None):
+def create_table(devices: list[umaru.Device], current_device: int = 0, limit: typing.Optional[int] = None):
     """
     Creates a table element, containing the formatted devices
 
     Parameters
     ----------
-    devices: list[procon.Device]
+    devices: list[umaru.Device]
     query: typing.Optional[str], default = None
     limit: typing.Optional[int], default = None
     current_device: int, default = 0
@@ -222,7 +222,7 @@ def main(default_filter: typing.Optional[str] = None):
         rich.progress.TimeElapsedColumn()),
         transient=True)
 
-    devices = reduce_devices(procon.pairable_devices(), query=default_filter)
+    devices = reduce_devices(umaru.pairable_devices(), query=default_filter)
     if len(devices) != 1:
         layout["upper"].update(create_table(devices=devices))
         layout["lower"].update(overall_progress)
@@ -240,7 +240,7 @@ def main(default_filter: typing.Optional[str] = None):
         with rich.live.Live(layout, refresh_per_second=10, transient=True):  # 60 fps yay
             while True:
                 previous_devices = devices
-                devices = reduce_devices(procon.pairable_devices(), query=current_filter)
+                devices = reduce_devices(umaru.pairable_devices(), query=current_filter)
                 try:
                     new_input = input_queue.get_nowait()
                     # with open("tests", "a") as f:
@@ -288,7 +288,7 @@ def main(default_filter: typing.Optional[str] = None):
             selection = "{}:{}".format(selected_device.vendor_id, selected_device.product_id)
         progress.console.print("[green][✓] Selected: {}".format(selection))
 
-        gamepad = procon.open_connection(selected_device)
+        gamepad = umaru.open_connection(selected_device)
 
     def list_repr(current, old):
         results = []
@@ -309,6 +309,7 @@ def main(default_filter: typing.Optional[str] = None):
             rich.progress.TimeElapsedColumn()),
             transient=True) as progress:
         progress.add_task("[green][✓] Connected")
+        progress.console.print("[ℹ] Press [magenta]CTRL+C[/magenta] or the [magenta]right and left[/magenta] stick simultaneously to quit")
         notify("Connected to a Pro Controller")
 
         last_share = False
@@ -326,7 +327,7 @@ def main(default_filter: typing.Optional[str] = None):
         last_right = False
         last = None
 
-        # last_state = procon.ControllerData([0] * 13)
+        # last_state = umaru.ControllerData([0] * 13)
         mouse_controller = mouse.Controller()
         keyboard_controller = keyboard.Controller()
 
@@ -341,7 +342,7 @@ def main(default_filter: typing.Optional[str] = None):
             # report = gamepad.read(64)
             try:
                 report = gamepad.read(13)
-                data = procon.ControllerData(report)
+                data = umaru.ControllerData(report)
 
                 # progress.console.print(data)
                 if data.buttons.sticks.LEFT and data.buttons.sticks.RIGHT:
@@ -349,10 +350,11 @@ def main(default_filter: typing.Optional[str] = None):
 
                 if data.buttons.SHARE != last_share and data.buttons.SHARE:
                     if keyboard_viewer:
-                        procon_keyboard.destroy(keyboard_viewer)
+                        umaru_keyboard.destroy(keyboard_viewer)
                         keyboard_viewer = None
                     else:
-                        keyboard_viewer = procon_keyboard.create_window()
+                        progress.console.print("[ℹ] Bringing up the virtual keyboard")
+                        keyboard_viewer = umaru_keyboard.create_window()
                         with keyboard_controller.pressed(keyboard.Key.cmd):
                             keyboard_controller.press(keyboard.Key.tab)
                             keyboard_controller.release(keyboard.Key.tab)
@@ -368,19 +370,19 @@ def main(default_filter: typing.Optional[str] = None):
                 if last_minus != data.buttons.MINUS and data.buttons.MINUS:
                     keyboard_controller.press(keyboard.Key.media_volume_down)
 
-                keyboard_title = ["ProCon"]
+                keyboard_title = ["Umaru"]
 
                 if keyboard_viewer is not None and captured:
                     # keyboard_viewer.app.update()
 
                     if last_up != data.buttons.directional.UP and data.buttons.directional.UP:
-                        procon_keyboard.move_on_keyboard(procon_keyboard.Direction.UP, keyboard_viewer)
+                        umaru_keyboard.move_on_keyboard(umaru_keyboard.Direction.UP, keyboard_viewer)
                     if last_down != data.buttons.directional.DOWN and data.buttons.directional.DOWN:
-                        procon_keyboard.move_on_keyboard(procon_keyboard.Direction.DOWN, keyboard_viewer)
+                        umaru_keyboard.move_on_keyboard(umaru_keyboard.Direction.DOWN, keyboard_viewer)
                     if last_left != data.buttons.directional.LEFT and data.buttons.directional.LEFT:
-                        procon_keyboard.move_on_keyboard(procon_keyboard.Direction.LEFT, keyboard_viewer)
+                        umaru_keyboard.move_on_keyboard(umaru_keyboard.Direction.LEFT, keyboard_viewer)
                     if last_right != data.buttons.directional.RIGHT and data.buttons.directional.RIGHT:
-                        procon_keyboard.move_on_keyboard(procon_keyboard.Direction.RIGHT, keyboard_viewer)
+                        umaru_keyboard.move_on_keyboard(umaru_keyboard.Direction.RIGHT, keyboard_viewer)
 
                     # progress.console.print(keyboard_viewer.cursor.element)
 
@@ -399,35 +401,35 @@ def main(default_filter: typing.Optional[str] = None):
                         else:
                             keyboard_controller.press(keyboard.Key.shift)
 
-                    element: procon_keyboard.KeyboardElement = keyboard_viewer.cursor.element
+                    element: umaru_keyboard.KeyboardElement = keyboard_viewer.cursor.element
                     keyboard_title.append("`{}` selected".format(element))
 
                     if keyboard_controller.shift_pressed:
                         keyboard_title.append("⇧ Shifted")
 
                     if last_a != data.buttons.A and data.buttons.A:
-                        # element: procon_keyboard.KeyboardElement = keyboard_viewer.cursor.element
+                        # element: umaru_keyboard.KeyboardElement = keyboard_viewer.cursor.element
 
                         match element:
-                            case procon_keyboard.SpecialKey.ESC:
+                            case umaru_keyboard.SpecialKey.ESC:
                                 pressing(keyboard.Key.esc)
-                            case procon_keyboard.SpecialKey.TAB:
+                            case umaru_keyboard.SpecialKey.TAB:
                                 pressing(keyboard.Key.tab)
-                            case procon_keyboard.SpecialKey.BACKSPACE:
+                            case umaru_keyboard.SpecialKey.BACKSPACE:
                                 pressing(keyboard.Key.backspace)
-                            case procon_keyboard.SpecialKey.ENTER:
+                            case umaru_keyboard.SpecialKey.ENTER:
                                 pressing(keyboard.Key.enter)
-                            case procon_keyboard.SpecialKey.CAPS_LOCK:
+                            case umaru_keyboard.SpecialKey.CAPS_LOCK:
                                 keyboard_controller.press(keyboard.Key.shift)
-                            case procon_keyboard.SpecialKey.SHIFT:
+                            case umaru_keyboard.SpecialKey.SHIFT:
                                 pressing(keyboard.Key.shift_l)
-                            case procon_keyboard.SpecialKey.RIGHT_SHIFT:
+                            case umaru_keyboard.SpecialKey.RIGHT_SHIFT:
                                 pressing(keyboard.Key.shift_r)
-                            case procon_keyboard.SpecialKey.CONTROL:
+                            case umaru_keyboard.SpecialKey.CONTROL:
                                 pressing(keyboard.Key.ctrl)
-                            case procon_keyboard.SpecialKey.CMD:
+                            case umaru_keyboard.SpecialKey.CMD:
                                 pressing(keyboard.Key.cmd)
-                            case procon_keyboard.SpecialKey.SPACE:
+                            case umaru_keyboard.SpecialKey.SPACE:
                                 pressing(keyboard.Key.space)
                             case _:
                                 pressing(element)
@@ -502,9 +504,14 @@ def main(default_filter: typing.Optional[str] = None):
                 pass
 
 
-if __name__ == "__main__":
+def entry():
+    """The CLI entrypoint"""
     parser = argparse.ArgumentParser()
     parser.add_argument("--filter", "-f", help="The default filter. Can be used to skip the controller discovery step.",
                         required=False, default=None, type=str)
     args = parser.parse_args()
     main(default_filter=args.filter)
+
+
+if __name__ == "__main__":
+    entry()

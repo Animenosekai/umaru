@@ -1,34 +1,32 @@
 # Reverse engineering the Nintendo Switch Pro Controller HID signal
 
 ```
+report = 
 [048, 108, 096, 000, 000, 000, 056, 088, 118, 207, 231, 127, 009, 000, 000, 000]
-~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~~
+~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~~~~^~
    0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15
 ```
 
 |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9 | 10 | 11 | 12 | 13 | 14 | 15 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | -- | -- | -- | -- | -- | -- | -- |
-| [The dummy number](#)
+| [Unknown](#unknown) | [Timestamp](#the-timestamp) | *Unknown* | [Right Buttons](#right-buttons) | [Middle Buttons](#middle-buttons) | [Left Buttons](#left-buttons) | *Unknown* | *Unknown* | [Left Stick](#left-stick) | *Unknown* | *Unknown* | [Right Stick](#right-stick) | *Unknown* | *Unknown* | *Unknown* | *Unknown* |
 
 ## Unknown
 
 > `report[0]`
 
-The first slot doesn't seem to be reporting anything useful on the controller.
+The first slot doesn't seem to be reporting anything useful on the controller (?)
 
+> **Note**  
 > Might be the battery ?
 
 ## The timestamp
 
 > `report[1]`
 
-This slot reports a timestamp and increases independently from user actions.
+This slot reports a timestamp and increases independently of user actions.
 
 Ranges from 0 to 255, by 3 on each update.
-
-## Unknown (2)
-
-Another unknown slot
 
 ## Bitmasks
 
@@ -76,12 +74,12 @@ This is a bitmask reporting on the current left buttons pressing state.
 
 | Value          | Name         |
 | -------------- | ------------ |
-| `0b00000001`   | Down D-Pad   |
-| `0b00000010`   | Up D-Pad     |
-| `0b00000100`   | Right D-Pad  |
-| `0b00001000`   | Left D-Pad   |
-| `0b01000000`   | L Button     |
-| `0b10000000`   | ZL Button    |
+| `0b00000001`   | *Down D*-Pad   |
+| `0b00000010`   | *Up D*-Pad     |
+| `0b00000100`   | *Right D*-Pad  |
+| `0b00001000`   | *Left D*-Pad   |
+| `0b01000000`   | *L* Button     |
+| `0b10000000`   | *ZL* Button    |
 
 ## Analog Sticks
 
@@ -90,6 +88,7 @@ This is a bitmask reporting on the current left buttons pressing state.
 > `report[8]`
 
 Ranges from 23 (bottom) to 226 (up)
+
 
 ### Right Stick
 

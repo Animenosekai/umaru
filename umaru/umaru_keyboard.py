@@ -1,5 +1,5 @@
 """
-A virtual keyboard viewer for ProCon
+A virtual keyboard viewer for Umaru
 """
 
 import tkinter as tk
@@ -10,6 +10,7 @@ import collections
 
 
 class SpecialKey(enum.Enum):
+    """All of the special keys on the keyboard"""
     ESC = "esc"
     POWER = "🍡"
     TAB = "TAB"
@@ -32,12 +33,14 @@ Keyboard = typing.List[typing.List[KeyboardElement]]
 
 @dataclasses.dataclass
 class Cursor:
+    """Represents the current cursor position on the keyboard"""
     x: int = 0
     y: int = 0
     element: KeyboardElement = SpecialKey.SPACE
 
 
 class Direction(enum.Enum):
+    """A direction on the keyboard"""
     UP = "up"
     DOWN = "down"
     RIGHT = "right"
@@ -76,7 +79,7 @@ def create_window(keyboard: Keyboard = AZERTY):
 
     # root = tk.Toplevel()
     root = tk.Tk()
-    root.title("ProCon Keyboard")
+    root.title("Umaru Keyboard")
 
     # Adjust size
     root.geometry("800x300")

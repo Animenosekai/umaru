@@ -1,5 +1,5 @@
 """
-procon
+umaru
 
 A Game Controller driver for everyday use.
 
@@ -9,7 +9,7 @@ Animenosekai
     Original Author, MIT License
 """
 
-from .procon import *
-from . import procon_keyboard
+from .umaru import *
+from . import umaru_keyboard
 from . import __main__
-# from .procon_keyboard import *
+# from .umaru_keyboard import *
