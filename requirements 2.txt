@@ -1,0 +1,5 @@
+pynput==1.7.6
+hidapi==0.13.1
+dataclasses==0.8
+hid==1.0.5
+notifypy==1.0.3.0

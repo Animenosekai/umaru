@@ -159,6 +159,8 @@ It should now connect to your controller.
   - The capture also releases the scroll, which is might act weird if the controller is not captured by the keyboard
   - You can press the share button again to remove the capture and close the virtual keyboard
 
+![Keyboard Screenshot](assets/screenshot_keyboard.png)
+
 ### Quitting Umaru
 
 Go back to your terminal and press `CTRL+C` or just press the left and right stick at the same time to quit `umaru`
